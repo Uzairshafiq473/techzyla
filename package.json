@@ -16,6 +16,7 @@
     "@react-three/fiber": "^8.15.12",
     "caniuse-lite": "^1.0.30001718",
     "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "framer-motion": "^10.18.0",
     "lucide-react": "^0.344.0",
