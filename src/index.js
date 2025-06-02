@@ -2,8 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import mysql from 'mysql2';
-
-
+import fetch from 'node-fetch';
 
 const app = express();
 app.use(cors());
@@ -42,4 +41,18 @@ app.post('/api/feedback', (req, res) => {
   );
 });
 
-app.listen(4000, () => console.log('Server running on port 4000'));
+// Public IP endpoint
+app.get('/get-ip', async (req, res) => {
+  try {
+    const response = await fetch('https://api.ipify.org?format=json');
+    const data = await response.json();
+    res.send(data.ip);
+  } catch (error) {
+    res.status(500).send('Error fetching public IP');
+  }
+});
+
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
