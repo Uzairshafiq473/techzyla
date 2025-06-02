@@ -6,7 +6,10 @@ import fetch from 'node-fetch';
 import util from 'util';
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: ['https://techzyla.com', 'https://www.techzyla.com'], // apne frontend domains yahan likhein
+  methods: ['GET', 'POST'],
+}));
 app.use(express.json());
 
 // Force HTTPS in production
@@ -82,8 +85,8 @@ app.get('/get-ip', async (req, res) => {
   try {
     const response = await fetch('https://api.ipify.org?format=json');
     const data = await response.json();
-    res.send(data.ip);
-  } catch (error) {
+    res.json(data);
+  } catch (err) {
     res.status(500).send('Error fetching public IP');
   }
 });
