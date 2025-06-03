@@ -7,12 +7,19 @@ import util from 'util';
 
 const app = express();
 
-
+// Updated CORS configuration
 const corsOptions = {
-    origin: ['https://techzyla.com', 'http://localhost:5173'], // Local testing ke liye
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // OPTIONS add karna zaroori hai
-    allowedHeaders: ['Content-Type', 'Authorization'], // Agar authentication use kar rahe ho
-    credentials: true, // Agar cookies ya sessions use kar rahe ho
+    origin: (origin, callback) => {
+        const allowedOrigins = ['https://techzyla.com', 'http://localhost:5173'];
+        if (allowedOrigins.includes(origin) || !origin) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
 };
 app.use(cors(corsOptions));
 
@@ -38,7 +45,6 @@ const dbConfig = {
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  // SSL option (if supported by Hostinger)
   ssl: {
     rejectUnauthorized: false
   }
@@ -70,6 +76,7 @@ connectWithRetry().catch(err => {
 // Contact form API
 app.post('/api/contact', (req, res) => {
   const { name, email, phone, service, message } = req.body;
+  console.log('Received contact request:', { name, email, phone, service, message }); // Log request
   pool.query(
     'INSERT INTO contact_messages (name, email, phone, service, message) VALUES (?, ?, ?, ?, ?)',
     [name, email, phone, service, message],
@@ -86,6 +93,7 @@ app.post('/api/contact', (req, res) => {
 // Feedback API
 app.post('/api/feedback', (req, res) => {
   const { name, role, company, rating, message } = req.body;
+  console.log('Received feedback request:', { name, role, company, rating, message }); // Log request
   pool.query(
     'INSERT INTO feedback (name, role, company, rating, message) VALUES (?, ?, ?, ?, ?)',
     [name, role, company, rating, message],
