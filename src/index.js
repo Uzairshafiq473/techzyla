@@ -6,11 +6,16 @@ import fetch from 'node-fetch';
 import util from 'util';
 
 const app = express();
-app.use(cors({
-  origin: 'https://techzyla.com',
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type'],
-}));
+
+
+const corsOptions = {
+    origin: ['https://techzyla.com', 'http://localhost:5173'], // Local testing ke liye
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // OPTIONS add karna zaroori hai
+    allowedHeaders: ['Content-Type', 'Authorization'], // Agar authentication use kar rahe ho
+    credentials: true, // Agar cookies ya sessions use kar rahe ho
+};
+app.use(cors(corsOptions));
+
 app.use(express.json());
 
 // Force HTTPS in production
