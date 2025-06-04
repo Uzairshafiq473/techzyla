@@ -227,8 +227,8 @@ User: ${userQuestion}
     const reply = data.choices?.[0]?.message?.content || "Sorry, I couldn't understand.";
     res.json({ reply });
   } catch (error) {
-    console.error('Groq API error:', error); // <-- Add this line
-    res.status(500).json({ reply: "Sorry, AI service error." });
+    console.error('Groq API error:', error?.response?.data || error.message || error);
+    res.json({ reply: "Sorry, AI service error." });
   }
 });
 
