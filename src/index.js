@@ -223,9 +223,11 @@ User: ${userQuestion}
     });
 
     const data = await groqRes.json();
+    console.log('Groq API response:', data); // <-- Add this line
     const reply = data.choices?.[0]?.message?.content || "Sorry, I couldn't understand.";
     res.json({ reply });
   } catch (error) {
+    console.error('Groq API error:', error); // <-- Add this line
     res.status(500).json({ reply: "Sorry, AI service error." });
   }
 });
@@ -234,3 +236,5 @@ const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+backendUrl = "/chat"
