@@ -118,6 +118,118 @@ app.get('/get-ip', async (req, res) => {
   }
 });
 
+// --- AI Chatbot Endpoint (Groq LLM, NO file upload support) ---
+app.post('/chat', async (req, res) => {
+  const apiKey = process.env.GROQ_API_KEY;
+  const userQuestion = req.body.message || "";
+
+  // Company knowledge base (full content)
+  const knowledgeBase = `
+### Company Overview
+- TechZyla is a forward-thinking software company based in Manchester, UK, founded in 2023.
+- Specializes in AI solutions, full-stack website development, graphic designing, social media management, and SEO optimization.
+- Works with clients across the UK and internationally, serving all industries (e-commerce, healthcare, finance, education, etc.).
+- Mission: Empower businesses through innovative, scalable digital solutions.
+- Vision: Enable businesses of all sizes to harness technology for growth and success.
+
+### Contact Information
+- Address: 123 Business Street, Manchester, M1 1AB, United Kingdom
+- Email: info@techzyla.com, support@techzyla.com
+- WhatsApp: +44 7477 579000
+- Business Hours: Monday–Friday, 9am–6pm (UK time)
+- Contact Form: Available on website for project inquiries.
+
+### Services Offered
+#### AI Solutions
+- AI-powered chatbots and agents for 24/7 customer engagement.
+- Custom AI agent development (automation, analytics, process optimization).
+- Machine learning, predictive analytics, custom AI model training.
+
+#### Full-Stack Website Development
+- Modern, responsive, and secure websites for all industries.
+- User-friendly CMS integration, e-commerce, performance optimization, secure hosting.
+
+#### Graphic Designing
+- Brand identity, banners, marketing materials, UI/UX design, animation, motion graphics.
+
+#### Social Media Management
+- Content strategy, regular posting, community engagement, analytics, paid campaigns.
+
+#### SEO Optimization
+- Website audit, keyword research, on-page/technical SEO, performance reporting.
+
+### Payment Methods
+- PayPal, Wise, UK Bank Transfer, JazzCash, EasyPaisa, Crypto (BTC, USDT).
+
+### Support
+- 24/7 responsive support for all clients.
+- Ongoing maintenance and support packages available.
+
+### Project Process
+- Discovery: Understanding business goals and challenges.
+- Planning: Strategy and roadmap.
+- Development: Building solutions with latest technologies.
+- Launch & Support: Deployment, monitoring, ongoing support.
+
+### Testimonials
+- Clients report improved efficiency, cost savings, increased traffic, and high satisfaction with TechZyla’s AI and digital solutions.
+
+### FAQ Highlights
+- Industries served: E-commerce, healthcare, finance, education, more.
+- Project timelines: Most websites delivered in 3–6 weeks.
+- Custom AI: Yes, custom AI agents and automation tools available.
+- Data security: Follows industry best practices for data security and privacy.
+- Pricing: Depends on project scope; free quote available.
+- SEO: Proven strategies to boost search rankings and drive organic traffic.
+- Feedback: Client feedback and changes are welcome during the project.
+
+### Core Values
+- Innovation, transparency, client-centric approach, data security, and continuous improvement.
+  `;
+
+  // Prompt with rules
+  const prompt = `
+You are TechZyla's AI customer support assistant. Here's your knowledge base:
+${knowledgeBase}
+
+Strict Response Formatting Rules:
+1. Always use clear section headers starting with ###
+2. Use bullet points for lists (start with - )
+3. Separate sections with two newlines (\\n\\n)
+4. For pricing, always use markdown tables
+5. Never combine different concepts in one paragraph
+6. Maximum 3 bullet points per section
+7. End with a clear next step/question
+8. Always reply in the same language as the user's question (Urdu, English, etc.)
+
+User: ${userQuestion}
+`;
+
+  try {
+    const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: "llama-3.3-70b-versatile",
+        messages: [
+          { role: "system", content: prompt },
+          { role: "user", content: userQuestion }
+        ],
+        max_tokens: 600
+      })
+    });
+
+    const data = await groqRes.json();
+    const reply = data.choices?.[0]?.message?.content || "Sorry, I couldn't understand.";
+    res.json({ reply });
+  } catch (error) {
+    res.status(500).json({ reply: "Sorry, AI service error." });
+  }
+});
+
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
