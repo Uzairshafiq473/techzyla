@@ -242,15 +242,4 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-<div className="chatbot-float-messages" ref={messagesContainerRef}>
-  {messages.map((m, i) => (
-    <div key={i} className={`chatbot-float-msg ${m.who}`}>
-      <div
-        className={`chatbot-float-bubble${i === 0 && m.who === "bot" ? " welcome" : ""}`}
-        dangerouslySetInnerHTML={{ __html: formatBotResponse(m.text) }}
-      />
-      {/* ...time etc... */}
-    </div>
-  ))}
-  <div ref={messagesEndRef} />
-</div>
+
