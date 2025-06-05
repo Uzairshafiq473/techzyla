@@ -10,7 +10,7 @@ const app = express();
 // Updated CORS configuration
 const corsOptions = {
     origin: (origin, callback) => {
-        const allowedOrigins = ['https://techzyla.com', 'http://localhost:5173'];
+        const allowedOrigins = ['https://techzyla.com', 'http://localhost:5173', null];
         if (allowedOrigins.includes(origin) || !origin) {
             callback(null, true);
         } else {
@@ -201,6 +201,11 @@ Strict Response Formatting Rules:
 6. Maximum 3 bullet points per section
 7. End with a clear next step/question
 8. Always reply in the same language as the user's question (Urdu, English, etc.)
+9. If the question is not directly answered in the knowledge base, generate a response based on your understanding of TechZyla.
+
+
+Additional Instruction:
+If the user's question is related to the company but the information is not found directly in the knowledge base, generate your own answer using your general understanding of the company.
 
 User: ${userQuestion}
 `;
@@ -213,7 +218,7 @@ User: ${userQuestion}
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
+        model: "llama-3.1-8b-instant",
         messages: [
           { role: "system", content: prompt },
           { role: "user", content: userQuestion }
@@ -236,3 +241,16 @@ const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+<div className="chatbot-float-messages" ref={messagesContainerRef}>
+  {messages.map((m, i) => (
+    <div key={i} className={`chatbot-float-msg ${m.who}`}>
+      <div
+        className={`chatbot-float-bubble${i === 0 && m.who === "bot" ? " welcome" : ""}`}
+        dangerouslySetInnerHTML={{ __html: formatBotResponse(m.text) }}
+      />
+      {/* ...time etc... */}
+    </div>
+  ))}
+  <div ref={messagesEndRef} />
+</div>
