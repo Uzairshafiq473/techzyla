@@ -4,6 +4,8 @@ import cors from 'cors';
 import mysql from 'mysql2';
 import fetch from 'node-fetch';
 import util from 'util';
+import fs from 'fs';
+import path from 'path';
 
 const app = express();
 
@@ -53,8 +55,7 @@ const dbConfig = {
   queueLimit: 0,
   ssl: {
     rejectUnauthorized: false,
-    // Add these lines for Hostinger MySQL
-    ca: fs.readFileSync(__dirname + '/path/to/ca-cert.pem'), // If available
+    ca: fs.readFileSync(path.join(__dirname, 'certs', 'ca-cert.pem')), // Updated path handling
     secureProtocol: 'TLSv1_2_method'
   }
 };
@@ -212,7 +213,6 @@ Strict Response Formatting Rules:
 8. Always reply in the same language as the user's question (Urdu, English, etc.)
 9. If the question is not directly answered in the knowledge base, generate a response based on your understanding of TechZyla.
 
-
 Additional Instruction:
 If the user's question is related to the company but the information is not found directly in the knowledge base, generate your own answer using your general understanding of the company.
 
@@ -259,5 +259,3 @@ const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
-
