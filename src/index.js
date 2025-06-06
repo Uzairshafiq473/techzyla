@@ -9,17 +9,22 @@ const app = express();
 
 // Updated CORS configuration
 const corsOptions = {
-    origin: (origin, callback) => {
-        const allowedOrigins = ['https://techzyla.com', 'http://localhost:5173', null];
-        if (allowedOrigins.includes(origin) || !origin) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      'https://techzyla.com',
+      'http://localhost:5173',
+      'https://philosophical-toinette-uzairshafiq468-4dc59941.koyeb.app',
+      null
+    ];
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
 };
 app.use(cors(corsOptions));
 
@@ -36,6 +41,7 @@ app.use((req, res, next) => {
   next();
 });
 
+// MySQL connection pool ko update karo
 const dbConfig = {
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -46,7 +52,10 @@ const dbConfig = {
   connectionLimit: 10,
   queueLimit: 0,
   ssl: {
-    rejectUnauthorized: false
+    rejectUnauthorized: false,
+    // Add these lines for Hostinger MySQL
+    ca: fs.readFileSync(__dirname + '/path/to/ca-cert.pem'), // If available
+    secureProtocol: 'TLSv1_2_method'
   }
 };
 
@@ -235,6 +244,15 @@ User: ${userQuestion}
     console.error('Groq API error:', error?.response?.data || error.message || error);
     res.json({ reply: "Sorry, AI service error." });
   }
+});
+
+// index.js mein ye add karo
+process.on('SIGTERM', () => {
+  console.log('Received SIGTERM. Graceful shutdown...');
+  server.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
 });
 
 const PORT = process.env.PORT || 4000;
