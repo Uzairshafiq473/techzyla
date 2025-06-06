@@ -53,10 +53,8 @@ const dbConfig = {
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  ssl: {
-    rejectUnauthorized: false,
-    ca: fs.readFileSync(path.join(__dirname, 'certs', 'ca-cert.pem')), // Updated path handling
-    secureProtocol: 'TLSv1_2_method'
+ ssl: {
+    rejectUnauthorized: false
   }
 };
 
