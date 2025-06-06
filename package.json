@@ -5,10 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview",
-    "start": " node src/index.js"
+    "build": "echo 'Skipping build for backend' && exit 0",
+    "start": "node src/index.js",
+    "heroku-postbuild": "echo 'Skip frontend build'"
   },
   "dependencies": {
     "@react-spring/three": "^9.7.3",
@@ -51,8 +50,8 @@
     "vite": "^6.3.5"
   },
   "resolutions": {
-  "picomatch": "^4.0.2"
-},
+    "picomatch": "^4.0.2"
+  },
   "main": "eslint.config.js",
   "keywords": [],
   "author": "",
