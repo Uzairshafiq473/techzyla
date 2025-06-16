@@ -15,7 +15,7 @@ const corsOptions = {
     const allowedOrigins = [
       'https://techzyla.com',
       'http://localhost:5173',
-      'https://philosophical-toinette-uzairshafiq468-4dc59941.koyeb.app',
+      'https://techzyla.onrender.com',
       null
     ];
     if (allowedOrigins.includes(origin) || !origin) {
