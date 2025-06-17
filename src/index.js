@@ -15,7 +15,7 @@ const corsOptions = {
     const allowedOrigins = [
       'https://techzyla.com',
       'http://localhost:5173',
-      'https://techzyla.onrender.com', // Add after deploy
+      'https://techzyla.onrender.com',
       null
     ];
     if (allowedOrigins.includes(origin) || !origin) {
@@ -34,13 +34,16 @@ app.use(express.json());
 
 // Force HTTPS in production
 app.use((req, res, next) => {
-  if (process.env.NODE_ENV === 'production' && req.headers['x-forwarded-proto'] === 'http') {
+  if (
+    process.env.NODE_ENV === 'production' &&
+    req.headers['x-forwarded-proto'] === 'http'
+  ) {
     return res.redirect(301, `https://${req.headers.host}${req.url}`);
   }
   next();
 });
 
-// MySQL connection pool
+// MySQL connection pool ko update karo
 const dbConfig = {
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -50,7 +53,9 @@ const dbConfig = {
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  ssl: { rejectUnauthorized: false }
+ ssl: {
+    rejectUnauthorized: false
+  }
 };
 
 const pool = mysql.createPool(dbConfig);
@@ -79,14 +84,14 @@ connectWithRetry().catch(err => {
 // Contact form API
 app.post('/api/contact', (req, res) => {
   const { name, email, phone, service, message } = req.body;
-  console.log('Received contact request:', { name, email, phone, service, message });
+  console.log('Received contact request:', { name, email, phone, service, message }); // Log request
   pool.query(
     'INSERT INTO contact_messages (name, email, phone, service, message) VALUES (?, ?, ?, ?, ?)',
     [name, email, phone, service, message],
     (err, result) => {
       if (err) {
-        console.error('Database error details:', err.code, err.sqlMessage);
-        return res.status(500).json({ error: 'Database connection failed', details: err.message });
+        console.error('Database error:', err.message);
+        return res.status(500).json({ error: 'Database connection failed' });
       }
       res.json({ success: true });
     }
@@ -96,14 +101,14 @@ app.post('/api/contact', (req, res) => {
 // Feedback API
 app.post('/api/feedback', (req, res) => {
   const { name, role, company, rating, message } = req.body;
-  console.log('Received feedback request:', { name, role, company, rating, message });
+  console.log('Received feedback request:', { name, role, company, rating, message }); // Log request
   pool.query(
     'INSERT INTO feedback (name, role, company, rating, message) VALUES (?, ?, ?, ?, ?)',
     [name, role, company, rating, message],
     (err, result) => {
       if (err) {
-        console.error('Database error details:', err.code, err.sqlMessage);
-        return res.status(500).json({ error: 'Database connection failed', details: err.message });
+        console.error('Database error:', err.message);
+        return res.status(500).json({ error: 'Database connection failed' });
       }
       res.json({ success: true });
     }
@@ -126,6 +131,7 @@ app.post('/chat', async (req, res) => {
   const apiKey = process.env.GROQ_API_KEY;
   const userQuestion = req.body.message || "";
 
+  // Company knowledge base (full content)
   const knowledgeBase = `
 ### Company Overview
 - TechZyla is a forward-thinking software company based in Manchester, UK, founded in 2023.
@@ -189,6 +195,7 @@ app.post('/chat', async (req, res) => {
 - Innovation, transparency, client-centric approach, data security, and continuous improvement.
   `;
 
+  // Prompt with rules
   const prompt = `
 You are TechZyla's AI customer support assistant. Here's your knowledge base:
 ${knowledgeBase}
@@ -228,7 +235,7 @@ User: ${userQuestion}
     });
 
     const data = await groqRes.json();
-    console.log('Groq API response:', data);
+    console.log('Groq API response:', data); // <-- Add this line
     const reply = data.choices?.[0]?.message?.content || "Sorry, I couldn't understand.";
     res.json({ reply });
   } catch (error) {
@@ -236,15 +243,17 @@ User: ${userQuestion}
     res.json({ reply: "Sorry, AI service error." });
   }
 });
-const PORT = process.env.PORT; // Render ka assigned port use karen
-const server = app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
 
+// index.js mein ye add karo
 process.on('SIGTERM', () => {
   console.log('Received SIGTERM. Graceful shutdown...');
   server.close(() => {
     console.log('Server closed');
     process.exit(0);
   });
+});
+
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
