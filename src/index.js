@@ -4,8 +4,6 @@ import cors from 'cors';
 import mysql from 'mysql2';
 import fetch from 'node-fetch';
 import util from 'util';
-import fs from 'fs';
-import path from 'path';
 
 const app = express();
 
@@ -79,6 +77,11 @@ const connectWithRetry = async (retries = 10, delay = 5000) => {
 connectWithRetry().catch(err => {
   console.error('Failed to connect to database after retries:', err.message);
   process.exit(1);
+});
+
+// Health check endpoint
+app.get('/', (req, res) => {
+  res.json({ status: 'TechZyla Backend is running!', timestamp: new Date().toISOString() });
 });
 
 // Contact form API
@@ -180,7 +183,7 @@ app.post('/chat', async (req, res) => {
 - Launch & Support: Deployment, monitoring, ongoing support.
 
 ### Testimonials
-- Clients report improved efficiency, cost savings, increased traffic, and high satisfaction with TechZyla’s AI and digital solutions.
+- Clients report improved efficiency, cost savings, increased traffic, and high satisfaction with TechZyla's AI and digital solutions.
 
 ### FAQ Highlights
 - Industries served: E-commerce, healthcare, finance, education, more.
@@ -254,6 +257,6 @@ process.on('SIGTERM', () => {
 });
 
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
